@@ -13,15 +13,17 @@ namespace Alura.CoisasAFazer.WebApp.Controllers
         [HttpPost]
         public IActionResult EndpointCadastraTarefa(CadastraTarefaVM model)
         {
+            var context = new DbTarefasContext();
+            var repo = new RepositorioTarefa(context);
+            
             var cmdObtemCateg = new ObtemCategoriaPorId(model.IdCategoria);
-            var categoria = new ObtemCategoriaPorIdHandler().Execute(cmdObtemCateg);
+            var categoria = new ObtemCategoriaPorIdHandler(repo).Execute(cmdObtemCateg);
             if (categoria == null)
             {
                 return NotFound("Categoria não encontrada");
             }
 
             var comando = new CadastraTarefa(model.Titulo, categoria, model.Prazo);
-            var repo = new RepositorioTarefa();
             var handler = new CadastraTarefaHandler(repo);
             handler.Execute(comando);
             return Ok();
