@@ -11,10 +11,10 @@ namespace Alura.CoisasAFazer.Services.Handlers
         IRepositorioTarefas _repo;
         ILogger<CadastraTarefaHandler> _logger;
 
-        public CadastraTarefaHandler(IRepositorioTarefas repo)
+        public CadastraTarefaHandler(IRepositorioTarefas repo, ILogger<CadastraTarefaHandler> logger)
         {
             _repo = repo;
-            _logger = new LoggerFactory().CreateLogger<CadastraTarefaHandler>();
+            _logger = logger;
         }
 
         public CommandResult Execute(CadastraTarefa comando)
@@ -35,6 +35,7 @@ namespace Alura.CoisasAFazer.Services.Handlers
             }
             catch (Exception e)
             {
+                _logger.LogError(e, e.Message);
                 return new CommandResult(false);
             }
 
