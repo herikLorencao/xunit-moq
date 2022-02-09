@@ -70,8 +70,46 @@ namespace Alura.CoisasAFazer.Teste
 
             // O Moq não consegue utilizar métodos de extensão como o LogError, por exemplo 
             mockLogger.Verify(
-                l => l.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<object>(), excecaoEsperada,
-                    It.IsAny<Func<object, Exception, string>>()), Times.Once());
+                l => l.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<object>(),
+                    excecaoEsperada, It.IsAny<Func<object, Exception, string>>()), Times.Once());
+        }
+
+        delegate void CapturaMensagemLog(LogLevel level, EventId eventId, object state, Exception exception,
+            Func<object, Exception, string> func);
+
+        [Fact]
+        public void QuandoExceptionForLancadaLogarMensagem()
+        {
+            var tituloTarefa = "Estudar xUnit e Moq";
+
+            var comando = new CadastraTarefa(tituloTarefa, new Categoria("Estudo"), DateTime.Now);
+            var mock = new Mock<IRepositorioTarefas>();
+            var mockLogger = new Mock<ILogger<CadastraTarefaHandler>>();
+            var handler = new CadastraTarefaHandler(mock.Object, mockLogger.Object);
+
+            var logLevel = LogLevel.Error;
+            var logMsg = string.Empty;
+
+            CapturaMensagemLog captura = (level, eventId, state, exception, func) =>
+            {
+                logLevel = level;
+                logMsg = func(state, exception);
+            };
+
+            mockLogger.Setup(
+                l => l.Log(
+                    It.IsAny<LogLevel>(),
+                    It.IsAny<EventId>(),
+                    It.IsAny<object>(),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<object,
+                        Exception, string>>()
+                )).Callback(captura);
+            
+            handler.Execute(comando);
+
+            Assert.Contains(tituloTarefa, logMsg);
+            Assert.Equal(LogLevel.Debug, logLevel);
         }
     }
 }
