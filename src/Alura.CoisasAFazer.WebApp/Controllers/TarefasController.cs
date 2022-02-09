@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Alura.CoisasAFazer.WebApp.Models;
 using Alura.CoisasAFazer.Core.Commands;
+using Alura.CoisasAFazer.Infrastructure;
 using Alura.CoisasAFazer.Services.Handlers;
 
 namespace Alura.CoisasAFazer.WebApp.Controllers
@@ -20,7 +21,8 @@ namespace Alura.CoisasAFazer.WebApp.Controllers
             }
 
             var comando = new CadastraTarefa(model.Titulo, categoria, model.Prazo);
-            var handler = new CadastraTarefaHandler();
+            var repo = new RepositorioTarefa();
+            var handler = new CadastraTarefaHandler(repo);
             handler.Execute(comando);
             return Ok();
         }
