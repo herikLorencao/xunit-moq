@@ -44,7 +44,7 @@ namespace Alura.CoisasAFazer.Teste
             var repo = mock.Object;
 
             var handler = new CadastraTarefaHandler(repo);
-            
+
             var commandResult = handler.Execute(comando);
             Assert.False(commandResult.IsSuccess);
         }
